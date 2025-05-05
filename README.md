@@ -4,7 +4,7 @@ Configure the durations on food buffs.
 
 ## Installation
 - Install [BepInEx Mod Pack](https://thunderstore.io/package/bbepis/BepInExPack/)
-- Download the latest [release](https://github.com/et508/Erenshor.FoodBuffDuration/releases/tag/1.0.0)
+- Download the latest [release](https://github.com/et508/Erenshor.FoodBuffDuration/releases/tag/1.1.0)
 - Extract files from Erenshor.FoodBuffDuration.zip into Erenshor\BepInEx\plugins\ folder.
 
 ## How To Change Durations
