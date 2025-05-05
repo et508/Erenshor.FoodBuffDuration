@@ -1,3 +1,4 @@
+using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -49,35 +50,61 @@ namespace FoodBuffDuration
                 new ConfigDescription("Duration in minutes for Spiced Fury (default 2 = 2 minutes = 20 ticks).",
                     new AcceptableValueRange<float>(0f, 200f)));
             
-            NourishedMinutes.SettingChanged += (sender, args) =>
-            {
-                ApplyBuffDuration();
-                Log.LogInfo($"[FBDI] Nourished updated to {NourishedMinutes.Value} minutes.");
-            };
-
-            HydratedMinutes.SettingChanged += (sender, args) =>
-            {
-                ApplyBuffDuration();
-                Log.LogInfo($"[FBDI] Hydrated updated to {HydratedMinutes.Value} minutes.");
-            };
-
-            VitheoMinutes.SettingChanged += (sender, args) =>
-            {
-                ApplyBuffDuration();
-                Log.LogInfo($"[FBDI] Vitheo's Blessing updated to {VitheoMinutes.Value} minutes.");
-            };
-
-            FuryMinutes.SettingChanged += (sender, args) =>
-            {
-                ApplyBuffDuration();
-                Log.LogInfo($"[FBDI] Spiced Fury updated to {FuryMinutes.Value} minutes.");
-            };
+            NourishedMinutes.SettingChanged += (_, __) => ApplyNourished();
+            HydratedMinutes.SettingChanged += (_, __) => ApplyHydrated();
+            VitheoMinutes.SettingChanged += (_, __) => ApplyVitheo();
+            FuryMinutes.SettingChanged += (_, __) => ApplyFury();
 
 
                 var harmony = new Harmony("et508.erenshor.foodbuffduration");
             harmony.PatchAll();
 
             Log.LogInfo("Food Buff Duration loaded with minute-based config.");
+        }
+        
+        private static Spell GetSpellById(string id)
+        {
+            return GameData.SpellDatabase?.SpellDatabase?.FirstOrDefault(s => s?.Id == id);
+        }
+        
+        private static void ApplyNourished()
+        {
+            var spell = GetSpellById("1735287");
+            if (spell == null) return;
+
+            int ticks = Mathf.RoundToInt(NourishedMinutes.Value * 10f);
+            spell.SpellDurationInTicks = ticks;
+            Log.LogInfo($"[FBDI] Nourished updated to {NourishedMinutes.Value} minutes ({ticks} ticks).");
+        }
+
+        private static void ApplyHydrated()
+        {
+            var spell = GetSpellById("20309875");
+            if (spell == null) return;
+
+            int ticks = Mathf.RoundToInt(HydratedMinutes.Value * 10f);
+            spell.SpellDurationInTicks = ticks;
+            Log.LogInfo($"[FBDI] Hydrated updated to {HydratedMinutes.Value} minutes ({ticks} ticks).");
+        }
+
+        private static void ApplyVitheo()
+        {
+            var spell = GetSpellById("68325939");
+            if (spell == null) return;
+
+            int ticks = Mathf.RoundToInt(VitheoMinutes.Value * 10f);
+            spell.SpellDurationInTicks = ticks;
+            Log.LogInfo($"[FBDI] Vitheo's Blessing updated to {VitheoMinutes.Value} minutes ({ticks} ticks).");
+        }
+
+        private static void ApplyFury()
+        {
+            var spell = GetSpellById("7328452");
+            if (spell == null) return;
+
+            int ticks = Mathf.RoundToInt(FuryMinutes.Value * 10f);
+            spell.SpellDurationInTicks = ticks;
+            Log.LogInfo($"[FBDI] Spiced Fury updated to {FuryMinutes.Value} minutes ({ticks} ticks).");
         }
         
     [HarmonyPatch(typeof(SpellDB), "Start")]
