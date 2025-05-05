@@ -1,11 +1,11 @@
 # Food Buff Duration
 
-Configure the durations on food buffs to your liking.
+Configure the durations on food buffs.
 
 ## Installation
 - Install [BepInEx Mod Pack](https://thunderstore.io/package/bbepis/BepInExPack/)
 - Download the latest [release](https://github.com/et508/Erenshor.FoodBuffDuration/releases/tag/1.0.0)
-- Extract the ET508.Erenshor.FoodBuffDuration folder and move it into the Erenshor\BepInEx\plugins\ folder.
+- Extract files from Erenshor.FoodBuffDuration.zip into Erenshor\BepInEx\plugins\ folder.
 
 ## How To Change Durations
 - Run Erenshor so the config file will be automatically created
