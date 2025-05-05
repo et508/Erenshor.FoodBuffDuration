@@ -4,15 +4,16 @@ using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
-namespace FoodBuffDuration
+namespace Erenshor.FoodBuffDuration
 {
-    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.0.0")]
+    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.1.0")]
     public class FoodBuffDurationPlugin : BaseUnityPlugin
     {
         internal static ConfigEntry<float> NourishedMinutes;
         internal static ConfigEntry<float> HydratedMinutes;
         internal static ConfigEntry<float> VitheoMinutes;
         internal static ConfigEntry<float> FuryMinutes;
+        internal static ConfigEntry<float> ProtectionMinutes;
         internal static BepInEx.Logging.ManualLogSource Log;
 
         private void Awake()
@@ -20,7 +21,7 @@ namespace FoodBuffDuration
             Log = Logger;
 
             NourishedMinutes = Config.Bind(
-                "Buff Durations (Minutes)",
+                "Buff Duration (Minutes)",
                 "Nourished",
                 10f,
                 new ConfigDescription(
@@ -28,7 +29,7 @@ namespace FoodBuffDuration
                     new AcceptableValueRange<float>(0f, 200f)));
 
             HydratedMinutes = Config.Bind(
-                "Buff Durations (Minutes)",
+                "Buff Duration (Minutes)",
                 "Hydrated",
                 10f,
                 new ConfigDescription(
@@ -36,7 +37,7 @@ namespace FoodBuffDuration
                     new AcceptableValueRange<float>(0f, 200f)));
 
             VitheoMinutes = Config.Bind(
-                "Buff Durations (Minutes)",
+                "Buff Duration (Minutes)",
                 "VitheosBlessing",
                 0.2f,
                 new ConfigDescription(
@@ -44,22 +45,31 @@ namespace FoodBuffDuration
                     new AcceptableValueRange<float>(0f, 200f)));
 
             FuryMinutes = Config.Bind(
-                "Buff Durations (Minutes)",
+                "Buff Duration (Minutes)",
                 "SpicedFury",
                 2f,
                 new ConfigDescription("Duration in minutes for Spiced Fury (default 2 = 2 minutes = 20 ticks).",
+                    new AcceptableValueRange<float>(0f, 200f)));
+            
+            ProtectionMinutes = Config.Bind(
+                "Buff Duration (Minutes)",
+                "MinorProtection",
+                25f,
+                new ConfigDescription(
+                    "Duration in minutes for Minor Protection (default 25 = 25 minutes = 250 ticks).",
                     new AcceptableValueRange<float>(0f, 200f)));
             
             NourishedMinutes.SettingChanged += (_, __) => ApplyNourished();
             HydratedMinutes.SettingChanged += (_, __) => ApplyHydrated();
             VitheoMinutes.SettingChanged += (_, __) => ApplyVitheo();
             FuryMinutes.SettingChanged += (_, __) => ApplyFury();
+            ProtectionMinutes.SettingChanged += (_, __) => ApplyProtection();
 
 
                 var harmony = new Harmony("et508.erenshor.foodbuffduration");
             harmony.PatchAll();
 
-            Log.LogInfo("Food Buff Duration loaded with minute-based config.");
+            Log.LogInfo("Food Buff Duration loaded.");
         }
         
         private static Spell GetSpellById(string id)
@@ -74,7 +84,6 @@ namespace FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(NourishedMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
-            Log.LogInfo($"[FBDI] Nourished updated to {NourishedMinutes.Value} minutes ({ticks} ticks).");
         }
 
         private static void ApplyHydrated()
@@ -84,7 +93,6 @@ namespace FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(HydratedMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
-            Log.LogInfo($"[FBDI] Hydrated updated to {HydratedMinutes.Value} minutes ({ticks} ticks).");
         }
 
         private static void ApplyVitheo()
@@ -94,7 +102,6 @@ namespace FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(VitheoMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
-            Log.LogInfo($"[FBDI] Vitheo's Blessing updated to {VitheoMinutes.Value} minutes ({ticks} ticks).");
         }
 
         private static void ApplyFury()
@@ -104,7 +111,15 @@ namespace FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(FuryMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
-            Log.LogInfo($"[FBDI] Spiced Fury updated to {FuryMinutes.Value} minutes ({ticks} ticks).");
+        }
+
+        private static void ApplyProtection()
+        {
+            var spell = GetSpellById("15855356");
+            if (spell == null) return;
+            
+            int ticks = Mathf.RoundToInt(ProtectionMinutes.Value * 10f);
+            spell.SpellDurationInTicks = ticks;
         }
         
     [HarmonyPatch(typeof(SpellDB), "Start")]
@@ -122,6 +137,7 @@ namespace FoodBuffDuration
             int hydratedTicks = Mathf.RoundToInt(HydratedMinutes.Value * 10f);
             int vitheoTicks = Mathf.RoundToInt(VitheoMinutes.Value * 10f);
             int furyTicks = Mathf.RoundToInt(FuryMinutes.Value * 10f);
+            int protectionTicks = Mathf.RoundToInt(ProtectionMinutes.Value * 10f);
 
             foreach (var spell in spellDB.SpellDatabase)
             {
@@ -132,19 +148,23 @@ namespace FoodBuffDuration
                 {
                     case "1735287": // Nourished
                         spell.SpellDurationInTicks = nourishedTicks;
-                        Log.LogInfo($"[FBDI] Set Nourished to {NourishedMinutes.Value} min ({nourishedTicks} ticks).");
+                        Log.LogInfo($"Set Nourished to {NourishedMinutes.Value} min ({nourishedTicks} ticks).");
                         break;
                     case "20309875": // Hydrated
                         spell.SpellDurationInTicks = hydratedTicks;
-                        Log.LogInfo($"[FBDI] Set Hydrated to {HydratedMinutes.Value} min ({hydratedTicks} ticks).");
+                        Log.LogInfo($"Set Hydrated to {HydratedMinutes.Value} min ({hydratedTicks} ticks).");
                         break;
                     case "68325939": // Vitheo's Blessing
                         spell.SpellDurationInTicks = vitheoTicks;
-                        Log.LogInfo($"[FBDI] Set Vitheo to {VitheoMinutes.Value} min ({vitheoTicks} ticks).");
+                        Log.LogInfo($"Set Vitheo to {VitheoMinutes.Value} min ({vitheoTicks} ticks).");
                         break;
                     case "7328452": // Spiced Fury
                         spell.SpellDurationInTicks = furyTicks;
-                        Log.LogInfo($"[FBDI] Set Fury to {FuryMinutes.Value} min ({furyTicks} ticks).");
+                        Log.LogInfo($"Set Fury to {FuryMinutes.Value} min ({furyTicks} ticks).");
+                        break;
+                    case "15855356": // Minor Protection
+                        spell.SpellDurationInTicks = protectionTicks;
+                        Log.LogInfo($"Set Minor Protection to {ProtectionMinutes.Value} min ({protectionTicks} ticks).");
                         break;
                 }
             }
