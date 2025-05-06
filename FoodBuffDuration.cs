@@ -9,6 +9,7 @@ namespace Erenshor.FoodBuffDuration
     [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.1.0")]
     public class FoodBuffDurationPlugin : BaseUnityPlugin
     {
+        internal static ConfigEntry<bool> MakeAllFoodBuffsGroupWide;
         internal static ConfigEntry<float> NourishedMinutes;
         internal static ConfigEntry<float> HydratedMinutes;
         internal static ConfigEntry<float> VitheoMinutes;
@@ -20,6 +21,12 @@ namespace Erenshor.FoodBuffDuration
         {
             Log = Logger;
 
+            MakeAllFoodBuffsGroupWide = Config.Bind(
+                "General",
+                "MakeBuffsGroupWide",
+                false,
+                "If true, food buffs will apply to the entire party.");
+            
             NourishedMinutes = Config.Bind(
                 "Buff Duration (Minutes)",
                 "Nourished",
@@ -84,6 +91,7 @@ namespace Erenshor.FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(NourishedMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
+            spell.GroupEffect = MakeAllFoodBuffsGroupWide.Value;
         }
 
         private static void ApplyHydrated()
@@ -93,6 +101,7 @@ namespace Erenshor.FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(HydratedMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
+            spell.GroupEffect = MakeAllFoodBuffsGroupWide.Value;
         }
 
         private static void ApplyVitheo()
@@ -102,6 +111,7 @@ namespace Erenshor.FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(VitheoMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
+            spell.GroupEffect = MakeAllFoodBuffsGroupWide.Value;
         }
 
         private static void ApplyFury()
@@ -111,6 +121,7 @@ namespace Erenshor.FoodBuffDuration
 
             int ticks = Mathf.RoundToInt(FuryMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
+            spell.GroupEffect = MakeAllFoodBuffsGroupWide.Value;
         }
 
         private static void ApplyProtection()
@@ -120,6 +131,7 @@ namespace Erenshor.FoodBuffDuration
             
             int ticks = Mathf.RoundToInt(ProtectionMinutes.Value * 10f);
             spell.SpellDurationInTicks = ticks;
+            spell.GroupEffect = MakeAllFoodBuffsGroupWide.Value;
         }
         
     [HarmonyPatch(typeof(SpellDB), "Start")]
