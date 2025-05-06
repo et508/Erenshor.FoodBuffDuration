@@ -36,15 +36,12 @@ namespace Erenshor.FoodBuffDuration
 
                 try
                 {
-                    // Clear all existing entries in memory
                     Config.Clear();
-
-                    // Delete the config file
+                    
                     string configPath = Config.ConfigFilePath;
                     if (System.IO.File.Exists(configPath))
                         System.IO.File.Delete(configPath);
-
-                    // Update the version and save the fresh config
+                    
                     ConfigVersion = Config.Bind("System", "ConfigVersion", CurrentConfigVersion, "DO NOT MODIFY: Used to detect config file changes.");
                     Config.Save();
 
