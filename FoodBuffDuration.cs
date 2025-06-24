@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Erenshor.FoodBuffDuration
 {
-    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.2.0")]
+    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.2.2")]
     public class FoodBuffDurationPlugin : BaseUnityPlugin
     {
         internal static ConfigEntry<string> ConfigVersion;
