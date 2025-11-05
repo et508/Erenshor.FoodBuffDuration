@@ -6,11 +6,15 @@ using UnityEngine;
 
 namespace Erenshor.FoodBuffDuration
 {
-    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.2.2")]
+    [BepInPlugin("et508.erenshor.foodbuffduration", "Food Buff Duration", "1.2.3")]
     public class FoodBuffDurationPlugin : BaseUnityPlugin
     {
+        private const float SecondsPerTick = 3f; // change if tick time changes
+        
+        private static float TicksPerMinute => 60f / SecondsPerTick;
+        
         internal static ConfigEntry<string> ConfigVersion;
-        private const string CurrentConfigVersion = "1.2.0";
+        private const string CurrentConfigVersion = "1.2.3";
 
         internal static ConfigEntry<float> NourishedMinutes;
         internal static ConfigEntry<bool> NourishedPartyBuff;
@@ -59,7 +63,7 @@ namespace Erenshor.FoodBuffDuration
                 "Duration",
                 10f,
                 new ConfigDescription(
-                    "Duration in minutes for Nourished (default 10 = 10 minutes = 100 ticks).",
+                    "Duration in minutes for Nourished.",
                     new AcceptableValueRange<float>(0f, 200f)));
             
             NourishedPartyBuff = Config.Bind(
@@ -73,7 +77,7 @@ namespace Erenshor.FoodBuffDuration
                 "Duration",
                 10f,
                 new ConfigDescription(
-                    "Duration in minutes for Hydrated (default 10 = 10 minutes = 100 ticks).",
+                    "Duration in minutes for Hydrated.",
                     new AcceptableValueRange<float>(0f, 200f)));
 
             HydratedPartyBuff = Config.Bind(
@@ -87,7 +91,7 @@ namespace Erenshor.FoodBuffDuration
                 "Duration",
                 0.2f,
                 new ConfigDescription(
-                    "Duration in minutes for Vitheos Blessing of the Sea (default 0.2 = 12 seconds = 2 ticks).",
+                    "Duration in minutes for Vitheos Blessing of the Sea.",
                     new AcceptableValueRange<float>(0f, 200f)));
             
             VitheoPartyBuff = Config.Bind(
@@ -100,7 +104,7 @@ namespace Erenshor.FoodBuffDuration
                 "SpicedFury",
                 "Duration",
                 2f,
-                new ConfigDescription("Duration in minutes for Spiced Fury (default 2 = 2 minutes = 20 ticks).",
+                new ConfigDescription("Duration in minutes for Spiced Fury.",
                     new AcceptableValueRange<float>(0f, 200f)));
             
             FuryPartyBuff = Config.Bind(
@@ -114,7 +118,7 @@ namespace Erenshor.FoodBuffDuration
                 "Duration",
                 25f,
                 new ConfigDescription(
-                    "Duration in minutes for Minor Protection (default 25 = 25 minutes = 250 ticks).",
+                    "Duration in minutes for Minor Protection.",
                     new AcceptableValueRange<float>(0f, 200f)));
             
             ProtectionPartyBuff = Config.Bind(
@@ -154,7 +158,7 @@ namespace Erenshor.FoodBuffDuration
             var spell = GetSpellById("1735287");
             if (spell == null) return;
 
-            int ticks = Mathf.RoundToInt(NourishedMinutes.Value * 10f);
+            int ticks = Mathf.RoundToInt(NourishedMinutes.Value * TicksPerMinute);
             spell.SpellDurationInTicks = ticks;
             spell.GroupEffect = NourishedPartyBuff.Value;
         }
@@ -164,7 +168,7 @@ namespace Erenshor.FoodBuffDuration
             var spell = GetSpellById("20309875");
             if (spell == null) return;
 
-            int ticks = Mathf.RoundToInt(HydratedMinutes.Value * 10f);
+            int ticks = Mathf.RoundToInt(HydratedMinutes.Value * TicksPerMinute);
             spell.SpellDurationInTicks = ticks;
             spell.GroupEffect = HydratedPartyBuff.Value;
         }
@@ -174,7 +178,7 @@ namespace Erenshor.FoodBuffDuration
             var spell = GetSpellById("68325939");
             if (spell == null) return;
 
-            int ticks = Mathf.RoundToInt(VitheoMinutes.Value * 10f);
+            int ticks = Mathf.RoundToInt(VitheoMinutes.Value * TicksPerMinute);
             spell.SpellDurationInTicks = ticks;
             spell.GroupEffect = VitheoPartyBuff.Value;
         }
@@ -184,7 +188,7 @@ namespace Erenshor.FoodBuffDuration
             var spell = GetSpellById("7328452");
             if (spell == null) return;
 
-            int ticks = Mathf.RoundToInt(FuryMinutes.Value * 10f);
+            int ticks = Mathf.RoundToInt(FuryMinutes.Value * TicksPerMinute);
             spell.SpellDurationInTicks = ticks;
             spell.GroupEffect = FuryPartyBuff.Value;
         }
@@ -194,7 +198,7 @@ namespace Erenshor.FoodBuffDuration
             var spell = GetSpellById("15855356");
             if (spell == null) return;
             
-            int ticks = Mathf.RoundToInt(ProtectionMinutes.Value * 10f);
+            int ticks = Mathf.RoundToInt(ProtectionMinutes.Value * TicksPerMinute);
             spell.SpellDurationInTicks = ticks;
             spell.GroupEffect = ProtectionPartyBuff.Value;
         }
